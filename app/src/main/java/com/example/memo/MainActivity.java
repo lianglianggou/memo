@@ -103,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
                                                     ContextMenu.ContextMenuInfo menuInfo) {
                         menu.add(0, 0, 0, "删除");
                         menu.add(0, 1, 0, "修改");
-                        menu.add(0, 2, 0, "修改");
+                        menu.add(0, 2, 0, "上升");
+                        menu.add(0, 3, 0, "置顶");
 
                     }
                 });
@@ -148,7 +149,48 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }).setNegativeButton("取消",null).show();
                 break;
-
+            case 2:
+                String xx=date.get(MID);
+                String yy=date.get(MID-1);
+                final String[] where2={date.get(MID-1)};
+                final String[] where3={date.get(MID)};
+                final String[] where4={"*"};
+                ContentValues values0=new ContentValues();
+                values0.put("author","*");
+                ContentValues values=new ContentValues();
+                values.put("author",xx);
+                db.update("memo",values0,"author=?",where2);
+                date.set(MID-1,xx);
+                ContentValues values1=new ContentValues();
+                values1.put("author",yy);
+                db.update("memo",values1,"author=?",where3);
+                db.update("memo",values,"author=?",where4);
+                date.set(MID,yy);
+                ArrayAdapter<String> adapter1=new ArrayAdapter<String>(MainActivity.this,R.layout.support_simple_spinner_dropdown_item,date);
+                ListView listView1=(ListView)findViewById(R.id.list_view);
+                listView1.setAdapter(adapter1);
+                break;
+            case 3:
+                String xxx=date.get(MID);
+                String yyy=date.get(0);
+                final String[] where22={date.get(0)};
+                final String[] where33={date.get(MID)};
+                final String[] where44={"*"};
+                ContentValues values00=new ContentValues();
+                values00.put("author","*");
+                ContentValues values2=new ContentValues();
+                values2.put("author",xxx);
+                db.update("memo",values00,"author=?",where22);
+                date.set(0,xxx);
+                ContentValues values3=new ContentValues();
+                values3.put("author",yyy);
+                db.update("memo",values3,"author=?",where33);
+                db.update("memo",values2,"author=?",where44);
+                date.set(MID,yyy);
+                ArrayAdapter<String> adapter2=new ArrayAdapter<String>(MainActivity.this,R.layout.support_simple_spinner_dropdown_item,date);
+                ListView listView2=(ListView)findViewById(R.id.list_view);
+                listView2.setAdapter(adapter2);
+                break;
             default:
                 break;
         }
