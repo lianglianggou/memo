@@ -2,11 +2,15 @@ package com.example.memo;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     int count=0;
     MyDatabaseHelper dbmemo;
     EditText e;
+    ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         e=(EditText)findViewById(R.id.textt);
         dbmemo=new MyDatabaseHelper(this,"memo.db",null,1);
-
+        mListView=(ListView) findViewById(R.id.list_view);
         SQLiteDatabase db=dbmemo.getWritableDatabase();
         Cursor cursor=db.query("memo",null,null,null,null,null,null);
 
@@ -60,7 +65,9 @@ public class MainActivity extends AppCompatActivity {
                 String s=date.get(position);
                 Toast.makeText(MainActivity.this,s,Toast.LENGTH_SHORT).show();
             }
-                  });
+        });
+        ItemOnLongClick1();
+
         bn=(Button)findViewById(R.id.addd);
 
         bn.setOnClickListener(new View.OnClickListener(){
@@ -79,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 listView.setAdapter(adapter);
             }
         });
+        /*创建数据库语句  一次就够
         bn=(Button)findViewById(R.id.create);
         bn.setOnClickListener(new View.OnClickListener(){
 
@@ -86,7 +94,67 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 dbmemo.getWritableDatabase();
             }
-        });
+        });*/
+    }
+    private void ItemOnLongClick1() {
+        mListView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+
+                    public void onCreateContextMenu(ContextMenu menu, View v,
+                                                    ContextMenu.ContextMenuInfo menuInfo) {
+                        menu.add(0, 0, 0, "删除");
+                        menu.add(0, 1, 0, "修改");
+                        menu.add(0, 2, 0, "修改");
+
+                    }
+                });
+    }
+    public boolean onContextItemSelected(MenuItem item) {
+        dbmemo=new MyDatabaseHelper(this,"memo.db",null,1);
+        SQLiteDatabase db=dbmemo.getWritableDatabase();
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+                .getMenuInfo();
+        int MID = (int) info.id;// 这里的info.id对应的就是数据库中_id的值
+
+        switch (item.getItemId()) {
+            case 0:
+                String[] where={date.get(MID)};
+                db.delete("memo","author=?",where);
+                date.remove(MID);
+                ArrayAdapter<String> adapter=new ArrayAdapter<String>(MainActivity.this,R.layout.support_simple_spinner_dropdown_item,date);
+                ListView listView=(ListView)findViewById(R.id.list_view);
+                listView.setAdapter(adapter);
+                break;
+
+            case 1:
+                final EditText et = new EditText(this);
+                final String[] where1={date.get(MID)};
+                final int c=MID;
+                et.setText(date.get(MID));
+                new AlertDialog.Builder(this).setTitle("请更改")
+                        .setIcon(android.R.drawable.sym_def_app_icon)
+                        .setView(et)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                SQLiteDatabase db=dbmemo.getWritableDatabase();
+                                String a=et.getText().toString();
+                                ContentValues values=new ContentValues();
+                                values.put("author",a);
+                                db.update("memo",values,"author=?",where1);
+                                date.set(c,a);
+                                ArrayAdapter<String> adapter=new ArrayAdapter<String>(MainActivity.this,R.layout.support_simple_spinner_dropdown_item,date);
+                                ListView listView=(ListView)findViewById(R.id.list_view);
+                                listView.setAdapter(adapter);
+                            }
+                        }).setNegativeButton("取消",null).show();
+                break;
+
+            default:
+                break;
+        }
+
+        return super.onContextItemSelected(item);
+
     }
     public class MyDatabaseHelper extends SQLiteOpenHelper {
         public static final String CREATE_MEMO = "create table memo ("
