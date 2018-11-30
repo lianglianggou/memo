@@ -3,6 +3,7 @@ package com.example.memo;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -10,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,6 +24,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import static android.R.attr.author;
+
 import static android.R.id.list;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,6 +37,67 @@ public class MainActivity extends AppCompatActivity {
     MyDatabaseHelper dbmemo;
     EditText e;
     ListView mListView;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.find:
+                final EditText et = new EditText(this);
+
+                et.setText("");
+                new AlertDialog.Builder(this).setTitle("请输入：")
+                        .setIcon(android.R.drawable.sym_def_app_icon)
+                        .setView(et)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                String a=et.getText().toString();
+                                String[] where1 = {"%"+a+"%"};
+                                //final String[] where1={a};
+                                SQLiteDatabase db=dbmemo.getWritableDatabase();
+
+
+                                String sql = "select "+ "author" + " from " + "memo"
+                                        + " where " + "author" + " like ? ";
+                                Cursor cursor = db.rawQuery(sql,where1);
+
+
+
+
+                                // Cursor cursor = db.query("WordTable",null,null,null,null,null,null);
+                                //Cursor cursor =  db.query("memo",new String[]{"author"},author+ " like ? ",new String[]{"%"+a+"%"},null,null,null);
+                                date.clear();
+                                if(cursor.moveToFirst()){
+                                    do{
+                                        String author=cursor.getString(cursor.getColumnIndex("author"));
+                                        date.add(author);
+                                    }while (cursor.moveToNext());
+                                    cursor.close();
+                                    //oast.makeText(MainActivity.this,"success",Toast.LENGTH_SHORT).show();
+                                }
+
+
+                                ArrayAdapter<String> adapter=new ArrayAdapter<String>(MainActivity.this,R.layout.support_simple_spinner_dropdown_item,date);
+                                ListView listView=(ListView)findViewById(R.id.list_view);
+                                listView.setAdapter(adapter);
+
+                            }
+                        }).setNegativeButton("取消",null).show();
+//                Intent intent = new Intent(MainActivity.this, CheckActivity.class);//实现点击菜单选项启动相应活动
+//                startActivity(intent);
+                //checkDialog();
+//                Toast.makeText(this,"check",Toast.LENGTH_SHORT).show();
+                break;
+
+            default:
+        }
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
