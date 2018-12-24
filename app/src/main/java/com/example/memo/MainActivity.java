@@ -21,11 +21,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-
 import static android.R.attr.author;
-
 import static android.R.id.list;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,13 +39,11 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.find:
                 final EditText et = new EditText(this);
-
                 et.setText("");
                 new AlertDialog.Builder(this).setTitle("请输入：")
                         .setIcon(android.R.drawable.sym_def_app_icon)
@@ -60,15 +55,9 @@ public class MainActivity extends AppCompatActivity {
                                 String[] where1 = {"%"+a+"%"};
                                 //final String[] where1={a};
                                 SQLiteDatabase db=dbmemo.getWritableDatabase();
-
-
                                 String sql = "select "+ "author" + " from " + "memo"
                                         + " where " + "author" + " like ? ";
                                 Cursor cursor = db.rawQuery(sql,where1);
-
-
-
-
                                 // Cursor cursor = db.query("WordTable",null,null,null,null,null,null);
                                 //Cursor cursor =  db.query("memo",new String[]{"author"},author+ " like ? ",new String[]{"%"+a+"%"},null,null,null);
                                 date.clear();
@@ -80,12 +69,9 @@ public class MainActivity extends AppCompatActivity {
                                     cursor.close();
                                     //oast.makeText(MainActivity.this,"success",Toast.LENGTH_SHORT).show();
                                 }
-
-
                                 ArrayAdapter<String> adapter=new ArrayAdapter<String>(MainActivity.this,R.layout.support_simple_spinner_dropdown_item,date);
                                 ListView listView=(ListView)findViewById(R.id.list_view);
                                 listView.setAdapter(adapter);
-
                             }
                         }).setNegativeButton("取消",null).show();
 //                Intent intent = new Intent(MainActivity.this, CheckActivity.class);//实现点击菜单选项启动相应活动
@@ -93,12 +79,10 @@ public class MainActivity extends AppCompatActivity {
                 //checkDialog();
 //                Toast.makeText(this,"check",Toast.LENGTH_SHORT).show();
                 break;
-
             default:
         }
         return true;
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         mListView=(ListView) findViewById(R.id.list_view);
         SQLiteDatabase db=dbmemo.getWritableDatabase();
         Cursor cursor=db.query("memo",null,null,null,null,null,null);
-
         if(cursor.moveToFirst()){
             do{
                 String author=cursor.getString(cursor.getColumnIndex("author"));
@@ -119,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
             cursor.close();
             //oast.makeText(MainActivity.this,"success",Toast.LENGTH_SHORT).show();
         }
-
         ArrayAdapter<String> adapter=new ArrayAdapter<String>(MainActivity.this,R.layout.support_simple_spinner_dropdown_item,date);
         ListView listView=(ListView)findViewById(R.id.list_view);
         listView.setAdapter(adapter);
@@ -132,9 +114,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         ItemOnLongClick1();
-
         bn=(Button)findViewById(R.id.addd);
-
         bn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -170,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
                         menu.add(0, 1, 0, "修改");
                         menu.add(0, 2, 0, "上升");
                         menu.add(0, 3, 0, "置顶");
-
                     }
                 });
     }
@@ -180,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
         int MID = (int) info.id;// 这里的info.id对应的就是数据库中_id的值
-
         switch (item.getItemId()) {
             case 0:
                 String[] where={date.get(MID)};
@@ -190,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
                 ListView listView=(ListView)findViewById(R.id.list_view);
                 listView.setAdapter(adapter);
                 break;
-
             case 1:
                 final EditText et = new EditText(this);
                 final String[] where1={date.get(MID)};
@@ -259,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 break;
         }
-
         return super.onContextItemSelected(item);
 
     }
@@ -269,11 +245,8 @@ public class MainActivity extends AppCompatActivity {
 
         private Context mContext;
         public MyDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-
             super(context, name, factory, version);
-
             mContext = context;
-
         }
         @Override
         public void onCreate(SQLiteDatabase db) {
